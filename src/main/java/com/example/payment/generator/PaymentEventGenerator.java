@@ -27,7 +27,7 @@ public class PaymentEventGenerator {
     @Channel("payment-events-out")
     Emitter<String> paymentEmitter;
 
-    @Scheduled(every = "10s")
+    @Scheduled(every = "10s", delayed = "15s")
     void tick() throws JsonProcessingException {
         PaymentEvent e = new PaymentEvent();
         e.eventId = UUID.randomUUID().toString();
