@@ -1,0 +1,31 @@
+# Maven / Quarkus build outputs
+/target/
+/target/**
+
+# Quarkus dev services / local cache
+.quarkus/
+
+# IDE settings
+/.idea/
+*.iml
+/.project
+/.classpath
+/.settings/
+/.vscode/
+/out/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local env files
+.env
+
+# Optional local overrides
+# docker-compose.override.yml
+
+# Node tooling (if any used by dev tools)
+node_modules/
