@@ -11,6 +11,7 @@ import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
 
@@ -41,7 +42,42 @@ public class PaymentEventGenerator {
         e.currency = "IDR";
         e.method = METHODS[RANDOM.nextInt(METHODS.length)];
         e.status = STATUSES[RANDOM.nextInt(STATUSES.length)];
-        e.attributes = Map.of("bank", "BCA", "channel", RANDOM.nextBoolean() ? "web" : "app");
+        Map<String, Object> attrs = new HashMap<>();
+        attrs.put("bank", "BCA");
+        attrs.put("channel", RANDOM.nextBoolean() ? "web" : "app");
+
+        // Perkenalkan variasi/anomali agar consumer dapat menormalisasi
+        // 30%: currency jadi huruf kecil
+        if (RANDOM.nextDouble() < 0.30) {
+            e.currency = e.currency.toLowerCase(); // "idr"
+        }
+        // 20%: amount negatif
+        if (RANDOM.nextDouble() < 0.20) {
+            e.amount = -e.amount;
+        }
+        // 30%: tambahkan spasi di ID fields
+        if (RANDOM.nextDouble() < 0.30) e.paymentId = " " + e.paymentId + " ";
+        if (RANDOM.nextDouble() < 0.30) e.orderId = "  " + e.orderId + "  ";
+        if (RANDOM.nextDouble() < 0.30) e.userId = "\t" + e.userId + "\t";
+        if (RANDOM.nextDouble() < 0.30) e.merchantId = e.merchantId + "  ";
+        // 25%: method tak dikenal / case aneh
+        if (RANDOM.nextDouble() < 0.25) {
+            e.method = RANDOM.nextBoolean() ? "Card" : "bank_transfer";
+        }
+        // 25%: status tak dikenal / case aneh
+        if (RANDOM.nextDouble() < 0.25) {
+            e.status = RANDOM.nextBoolean() ? "Completed" : "DONE";
+        }
+        // 15%: eventTime null (akan diisi di service)
+        if (RANDOM.nextDouble() < 0.15) {
+            e.eventTime = null;
+        }
+        // 20%: atribut dengan spasi/variasi casing
+        if (RANDOM.nextDouble() < 0.20) {
+            attrs.put("bank", "  bca  ");
+            attrs.put("Channel", "WEB");
+        }
+        e.attributes = attrs;
 
         paymentEmitter.send(objectMapper.writeValueAsString(e));
     }
